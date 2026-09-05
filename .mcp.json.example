@@ -1,0 +1,18 @@
+{
+  "//": "Claude Code / Claude Desktop template. Copy to .mcp.json (project scope) and set the absolute path, OR run scripts/install-mcp.sh (registers at user scope, path resolved automatically). TRACEFINITY_AUTH_MODE is optional — omit it or leave it 'open'; the default behaves the same. A local 'native' instance isn't the documented setup.",
+  "mcpServers": {
+    "tracefinity": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "/ABSOLUTE/PATH/TO/tracefinity-local-with-mcp/mcp",
+        "tracefinity-mcp"
+      ],
+      "env": {
+        "TRACEFINITY_BASE_URL": "http://localhost:3000",
+        "TRACEFINITY_AUTH_MODE": "open"
+      }
+    }
+  }
+}

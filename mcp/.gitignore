@@ -1,0 +1,15 @@
+# Defense-in-depth for when mcp/ is used on its own. Root .gitignore also covers these.
+.venv/
+secrets/
+downloads/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+.env.*
+!.env.example
+*.secret
+*.secret.tmp
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/

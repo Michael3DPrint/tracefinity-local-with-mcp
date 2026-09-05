@@ -1,0 +1,52 @@
+# ── local config (never commit; *.example files are the templates) ─────────────
+.env
+.env.*
+!.env.example
+!*/.env.example
+.mcp.json
+compose.override.yaml
+*.secret
+*.secret.tmp
+
+# ── Tracefinity runtime state ────────────────────────────────────────────────
+/data/
+mcp/secrets/
+mcp/downloads/
+
+# ── Python / uv ─────────────────────────────────────────────────────────────
+.venv/
+mcp/.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+# uv.lock IS committed — do not ignore it
+
+# ── editors / IDEs ──────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── OS cruft ───────────────────────────────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+Desktop.ini
+
+# ── misc ───────────────────────────────────────────────────────────────────
+*.log
+*.tmp
+*.bak
+*.orig
+*.rej
+node_modules/
+.claude/

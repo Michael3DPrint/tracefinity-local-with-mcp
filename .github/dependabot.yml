@@ -1,0 +1,32 @@
+version: 2
+updates:
+  # Upstream Tracefinity image, pinned in compose.yaml.
+  # Uses the "docker-compose" ecosystem (NOT "docker" — that one only matches
+  # Dockerfile/Containerfile, and this repo has none). Its file regex is
+  # /(docker-)?compose(-[\w]+)?(?>\.[\w-]+)?\.ya?ml/i, so it matches "compose.yaml".
+  # Dependabot opens a PR when a newer image tag is published; CI runs verify.py
+  # against it, and merging the PR is how you adopt an upstream release.
+  - package-ecosystem: "docker-compose"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
+    labels:
+      - "upstream-sync"
+
+  # The MCP server's own Python dependencies (mcp, httpx), pinned in mcp/uv.lock.
+  - package-ecosystem: "uv"
+    directory: "/mcp"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(mcp)"
+
+  # CI action versions in .github/workflows/.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "ci"

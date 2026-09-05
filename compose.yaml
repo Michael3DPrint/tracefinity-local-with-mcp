@@ -1,0 +1,28 @@
+# Tracefinity, run from the upstream published image (not vendored source).
+# The image tag below is the single "imported dependency" — Dependabot bumps it
+# weekly via PR (see .github/dependabot.yml). To adopt an update: merge the PR,
+# then `docker compose pull && docker compose up -d`.
+name: tracefinity
+
+services:
+  tracefinity:
+    image: ghcr.io/tracefinity/tracefinity:0.9.2
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      # Local-only by default. Set TRACEFINITY_BIND=0.0.0.0 in .env to reach it
+      # from other devices on your LAN. There is no authentication (see below), so
+      # only do that on a network you control. See README "Security".
+      - "${TRACEFINITY_BIND:-127.0.0.1}:${TRACEFINITY_PORT:-3000}:3000"
+    environment:
+      # This overlay is a single-user, local / trusted-LAN tool: no login, single
+      # "default" workspace. `native` (the image's accounts + login + 2FA) is NOT
+      # supported or recommended here — if you need real auth, deploy Tracefinity
+      # yourself behind your own auth proxy.
+      AUTH_MODE: "${TRACEFINITY_AUTH_MODE:-open}"
+      PHOTO_STATIONS: "true"
+      # app-side upload cap (MB). The image's nginx hard-caps at 25; see docs/operations.md
+      MAX_UPLOAD_MB: "${TRACEFINITY_MAX_UPLOAD_MB:-20}"
+    volumes:
+      - ./data:/app/storage

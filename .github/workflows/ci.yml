@@ -1,0 +1,45 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# read-only token; this workflow never writes to the repo
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: scrub-check (no machine/personal strings)
+        run: bash scripts/scrub-check.sh
+
+      - name: compose config is valid
+        run: docker compose config
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: MCP compiles
+        working-directory: mcp
+        run: |
+          uv sync
+          uv run python -m py_compile tracefinity_mcp/*.py verify.py
+
+      - name: start Tracefinity + run verify.py
+        run: |
+          docker compose up -d
+          for i in $(seq 1 40); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' localhost:3000/api/auth/status || true)
+            [ "$code" = "200" ] && break
+            sleep 6
+          done
+          curl -fsS localhost:3000/api/version
+          cd mcp && uv run python verify.py
+
+      - name: container logs (on failure)
+        if: failure()
+        run: docker compose logs --tail=120

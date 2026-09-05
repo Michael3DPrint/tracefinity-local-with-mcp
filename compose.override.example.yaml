@@ -1,0 +1,23 @@
+# Copy to compose.override.yaml (git-ignored) for host-specific tweaks.
+# `docker compose` merges it on top of compose.yaml automatically.
+services:
+  tracefinity:
+    environment:
+      # Run the container process as your host user so ./data is not root-owned.
+      # Uncomment and set to YOUR ids — `id -u` / `id -g` (macOS is usually 501).
+      # PUID: "501"
+      # PGID: "20"
+
+      # Real API keys go HERE (this file is git-ignored), never in compose.yaml:
+      # GOOGLE_API_KEY: "your-key"
+      # REPLICATE_API_TOKEN: "your-token"
+      # FAL_KEY: "your-key"
+
+    # ── optional hardening ────────────────────────────────────────────────
+    # Cap memory so a runaway STL-generation job can't exhaust the host
+    # (tune upward if the container OOMs while loading models):
+    # mem_limit: 6g
+    # Bound process/thread count:
+    # pids_limit: 1024
+    # Pin to an exact digest as well as the tag:
+    # image: ghcr.io/tracefinity/tracefinity:0.9.2@sha256:<digest from 'docker buildx imagetools inspect'>
