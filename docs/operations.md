@@ -26,11 +26,32 @@ no authentication in this setup.
 ## No authentication
 
 `AUTH_MODE=open`: no accounts, no login, no 2FA, a single `default` workspace. See
-[README → Authentication](../README.md#authentication-three-separate-layers) for
-the full picture and why this is deliberate. This overlay is documented for `open`
-mode; the MCP also works against a local `native` instance, but that isn't the
-focus. For multiple users or internet exposure, deploy Tracefinity yourself behind
-your own auth proxy.
+[security.md](security.md#authentication-three-separate-layers) for the full
+picture and why this is deliberate. This overlay is documented for `open` mode;
+the MCP also works against a local `native` instance, but that isn't the focus.
+For multiple users or internet exposure, deploy Tracefinity yourself behind your
+own auth proxy.
+
+## LAN / phone access
+
+By default the port is bound to `127.0.0.1` (this machine only). To reach the
+**web UI** from a phone or another computer on your network — **read
+[security.md](security.md#network-exposure) first**: with `AUTH_MODE=open` this
+gives every device on that network unauthenticated full access.
+
+```bash
+# in .env
+TRACEFINITY_BIND=0.0.0.0
+```
+then `docker compose up -d`. From the same network:
+
+- `http://<this-machine-ip>:3000` — IP via `ipconfig getifaddr en0` (macOS) or
+  `hostname -I` (Linux)
+- `http://<this-machine-hostname>.local:3000` — usually works from phones and
+  survives IP changes
+
+If the macOS firewall is on, allow incoming connections for Docker when prompted.
+Set `TRACEFINITY_BIND=127.0.0.1` again to lock it back down.
 
 ## Upload size limit
 
@@ -58,16 +79,27 @@ services:
       PGID: "1000"   # id -g
 ```
 
-## Updating Tracefinity
+## Updating — Tracefinity, MCP deps, CI
 
-Merge the Dependabot PR that bumps the image tag in `compose.yaml`, then:
+[`.github/dependabot.yml`](../.github/dependabot.yml) opens PRs for three things:
+
+| ecosystem | path | schedule | what |
+|---|---|---|---|
+| `docker-compose` | `/` | weekly | the Tracefinity image tag in `compose.yaml` |
+| `uv` | `/mcp` | weekly | the MCP's Python deps (`mcp`, `httpx`) via `mcp/uv.lock` |
+| `github-actions` | `/` | monthly | the CI action versions |
+
+For an **image bump**, CI ([`ci.yml`](../.github/workflows/ci.yml)) starts the new
+image and runs `verify.py` against it — an endpoint smoke test only, so still
+eyeball a real photo after a big jump. Merge the PR, then locally:
 
 ```bash
 docker compose pull
 docker compose up -d
 ```
 
-To roll back, set the previous tag in `compose.override.yaml` and pull again.
+Roll back by setting the previous tag in `compose.override.yaml` and pulling
+again. Manual bump: edit the tag in `compose.yaml` (or the override) and pull.
 
 ## Troubleshooting
 

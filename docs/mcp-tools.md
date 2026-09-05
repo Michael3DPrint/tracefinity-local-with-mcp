@@ -1,16 +1,20 @@
 # MCP tools
 
-The server (`mcp/tracefinity_mcp/server.py`) wraps the **local Tracefinity
-install's REST API** (`http://localhost:3000/api/*` by default, via
-`TRACEFINITY_BASE_URL`). It does not use that install's web UI, and has nothing to
-do with the hosted `tracefinity.net`.
+`mcp/` is a standalone Python package (`mcp[cli]<2`, `httpx` — no model/vendor
+SDK). It speaks the MCP protocol over **stdio**, derives its identity from the OS
+user at runtime, and stores nothing sensitive in the repo. `server.py` wraps the
+**local Tracefinity install's REST API** (`http://localhost:3000/api/*` by
+default, via `TRACEFINITY_BASE_URL`) as tools: upload / corners / trace, sessions,
+the tool library, bins, bin-projects, photo-stations, and file downloads (STL /
+3MF / SVG land in `mcp/downloads/`). It does not use the web UI, and has nothing
+to do with the hosted `tracefinity.net`.
 
 **58 tools** in the default `open` mode. The MCP talks only to the local API
 (including reading `/api/auth/status` to detect the mode) and does no
 login/account operations; the 16 account/login/2FA/admin functions in the last
 catalogue row are not registered. Against a local `native` instance those 16
 register too (74 total) — not the documented default. See
-[README → Authentication](../README.md#authentication-three-separate-layers).
+[security.md](security.md#authentication-three-separate-layers).
 
 ## Catalogue
 
@@ -48,29 +52,25 @@ generate_bin(bin_id); download_bin_stl(bin_id)    -> file in mcp/downloads/
 `corners` can be passed straight from `upload_photo`'s `detected_corners`.
 `paper_size` is one of `A4`, `Letter`, `A3`, `Tabloid`.
 
-## Which MCP client
+## Use with an MCP client
 
-Any of them — this is a plain MCP **stdio** server with no model/vendor SDK.
-See the [Use with an MCP client](../README.md#use-with-an-mcp-client) table in the
-README for Claude Code / Claude Desktop / Cursor / Cline / Zed / Continue / Goose /
-LibreChat / LM Studio / SDK setups. The universal config is:
+Any MCP client works. Universal config:
 
-```
-command: uv
-args:    run --directory <abs path>/mcp tracefinity-mcp
-env:     TRACEFINITY_BASE_URL=http://localhost:3000
-```
+- **command:** `uv`
+- **args:** `run --directory /ABS/PATH/TO/tracefinity-local-with-mcp/mcp tracefinity-mcp`
+- **env:** `TRACEFINITY_BASE_URL=http://localhost:3000`
+  (`TRACEFINITY_AUTH_MODE=open` optional — it just skips a mode-detection read)
 
-`TRACEFINITY_AUTH_MODE=open` is optional — it just skips a mode-detection read;
-the default behaves the same.
+| Client | How |
+|---|---|
+| Claude Code | `./scripts/install-mcp.sh claude` (or copy `.mcp.json.example` → `.mcp.json`) |
+| Gemini CLI | `./scripts/install-mcp.sh gemini` (uses `gemini mcp add`, else writes `~/.gemini/settings.json`) |
+| Claude Desktop | add command/args/env above to `claude_desktop_config.json` → `mcpServers` |
+| Cursor / Cline / Zed / Continue / Goose / LibreChat / LM Studio | add the same command/args/env in that client's MCP settings |
+| SDK / custom (OpenAI Agents SDK, Google ADK, `mcp` Python/TS SDK) | launch it as a stdio subprocess |
+| Standalone | `cd mcp && uv run tracefinity-mcp` (or `npx @modelcontextprotocol/inspector uv run --directory mcp tracefinity-mcp`) |
 
-Run it by hand to check it starts:
-
-```bash
-cd mcp && uv run tracefinity-mcp
-# or, with the MCP Inspector UI:
-npx @modelcontextprotocol/inspector uv run --directory mcp tracefinity-mcp
-```
+`./scripts/install-mcp.sh` with no argument prompts for **Claude / Gemini / both**.
 
 Config knobs (env): `TRACEFINITY_BASE_URL`, `TRACEFINITY_AUTH_MODE`,
 `TRACEFINITY_SECRET_DIR`, `TRACEFINITY_DOWNLOAD_DIR`.
