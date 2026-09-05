@@ -100,3 +100,16 @@ call-by-call: **[`docs/security.md`](docs/security.md)**.
 - Claude Code's project memory lives under `~/.claude/`, separate from this repo —
   nothing about your setup is captured here.
 - Not affiliated with or endorsed by Tracefinity. Upstream is MIT licensed.
+
+## AI assistance
+
+The overlay code and docs here were written with **Claude Code** (`claude-sonnet-5`);
+that is why commits carry a `Co-Authored-By: Claude` / `Claude-Session:` trailer.
+
+| Item | Claude Code | Human (maintainer) |
+|---|---|---|
+| `compose.yaml`, `mcp/` server, `scripts/`, `.github/` (CI + Dependabot), `docs/`, this README | drafted and iterated | requirements, design decisions (image-pin vs. vendoring, `open` auth mode, repo layout), code review, every commit and push |
+| Upstream Tracefinity — the `ghcr.io/tracefinity/tracefinity` image | not touched; imported as a version-pinned image, no source vendored or modified | picks the pinned tag, reviews Dependabot bumps |
+| Local bring-up + `verify.py` results | — | run and verified on the maintainer's own machine |
+| Secrets / personal config | none committed (git-ignored); `scrub-check` fails CI on leaked machine paths | — |
+| GitHub repo settings (branch ruleset, Actions allow-list, Dependabot alerts) | proposed and applied via API under maintainer direction | approved the changes |
