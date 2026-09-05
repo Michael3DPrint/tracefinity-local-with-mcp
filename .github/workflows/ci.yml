@@ -1,17 +1,39 @@
 name: ci
 
+# Cost guardrails (this repo is public -> GitHub-hosted standard runners are
+# unlimited/free; these keep it that way and cap any runaway job):
+#   - runs only on main + real PRs to main, and skips docs-only changes
+#   - concurrency cancels superseded runs instead of queueing them
+#   - timeout-minutes caps a hung container/model pull (default is 6 h)
+#   - ubuntu-latest only -> never a paid larger/GPU runner
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'LICENSE'
+      - '.gitignore'
   pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'LICENSE'
+      - '.gitignore'
 
 # read-only token; this workflow never writes to the repo
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest          # standard hosted runner only
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
@@ -30,6 +52,7 @@ jobs:
           uv run python -m py_compile tracefinity_mcp/*.py verify.py
 
       - name: start Tracefinity + run verify.py
+        timeout-minutes: 12
         run: |
           docker compose up -d
           for i in $(seq 1 40); do
