@@ -64,7 +64,7 @@ users or internet exposure, run Tracefinity yourself behind your own auth proxy.
 | 3 | `tracefinity-mcp` → local install `/api/*` | HTTP to `TRACEFINITY_BASE_URL` | **loopback** (keep it that way) | **none** — this setup has no Tracefinity auth (**layer 2**) |
 | 4 | browser / phone → local install `/` (web UI) | HTTP | **loopback**, or **LAN** if `TRACEFINITY_BIND=0.0.0.0` | **none** — same open instance, no login (**layer 3**) |
 | 5 | `docker compose pull` → GHCR | HTTPS, outbound | internet | none (public image); once per pinned version |
-| 6 | container → GitHub releases | HTTPS, outbound | internet | none; tracing-model weights (some at container startup, the rest on first trace), one-time, cached in `data/` |
+| 6 | container → GitHub releases | HTTPS, outbound | internet | none; segmentation models (some at container startup, the rest on first trace), cached in the container at `/app/.u2net` — not in `data/`, so re-fetched after a `docker compose down` |
 | 7 | container → Gemini / Replicate / fal | HTTPS, outbound | internet | **your API key — only if you set one** in `compose.override.yaml`; off by default |
 
 Rows 2–4 are request/response *into* the local stack; 5–7 are the container

@@ -27,7 +27,7 @@ genuinely can't be installed/started non-interactively, stop and report that.
 Then `export PATH="$HOME/.docker/bin:$HOME/.local/bin:$PATH"` for the rest of the run.
 
 **3 — Setup.** `bash scripts/init.sh` — writes `.env`, makes dirs,
-`docker compose pull` (~4.5 GB, allow several minutes), `uv sync`. Re-run on a
+`docker compose pull` (~4.4 GB image, allow several minutes), `uv sync`. Re-run on a
 transient network error.
 
 **4 — Start & wait.** `docker compose up -d`, then poll — the backend loads ML

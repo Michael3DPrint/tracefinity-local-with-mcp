@@ -35,10 +35,20 @@ Homebrew, Linux via your package manager). `--fix` installs non-interactively;
 | `claude` *or* `gemini` CLI | no — only to wire the MCP into that assistant | — | — | [`docs/mcp-tools.md`](docs/mcp-tools.md#use-with-an-mcp-client) |
 | `gh` (GitHub CLI) | no — only if this repo is **private** | `brew install gh` | `sudo apt-get install -y gh` | <https://cli.github.com> |
 
-**~6 GB disk** (image ≈ 4.5 GB + model weights + a small host venv) and outbound
-internet on first run (image pull; tracing-model weights download into the
-container, one-time, cached in `data/`). If `docker` / `uv` "aren't found" they
-may just be off your shell `PATH` — `preflight.sh` flags this.
+**Disk: ~4.6 GB installed** — budget ~6 GB with working files:
+
+| Part | Size | What |
+|---|---|---|
+| Container image | **~4.4 GB** | PyTorch + torchvision ≈ 0.9 · other Python libs (SciPy, NumPy, Numba, OpenCV, onnxruntime, scikit-image, FastAPI…) ≈ 0.9 · Next.js web-UI `node_modules` + build ≈ 0.8 · system libs (OpenGL/X11 for OpenCV, Debian base, Python 3.12) ≈ 1.4 |
+| MCP host venv (`mcp/.venv`) + uv cache | ~150 MB | `mcp` + `httpx` and their deps |
+| Segmentation model `u2netp.onnx` | ~4 MB | downloaded into the container on first run; ≤ ~180 MB if you switch to a higher-quality model |
+| `data/` workspace | grows | your uploaded photos + generated STL / 3MF |
+
+First run needs outbound internet: the image pull, then the segmentation model
+downloads into the container (re-fetched after `docker compose down`; kept across
+a plain restart). **There is no local LLM** — the AI-label features are optional
+and call a cloud API only if you set a key. If `docker` / `uv` "aren't found"
+they may just be off your shell `PATH` — `preflight.sh` flags this.
 
 ## Quick start
 

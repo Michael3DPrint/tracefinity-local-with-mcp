@@ -106,7 +106,7 @@ again. Manual bump: edit the tag in `compose.yaml` (or the override) and pull.
 | Symptom | Fix |
 |---|---|
 | `502 Bad Gateway` right after `up` | backend still loading models — wait ~30-90 s (usually ~40) |
-| first `trace` call is slow / errors offline | some tracing models download at container startup, the rest on first trace; needs outbound internet once, then cached in `data/` |
+| first `trace` call is slow / errors offline | segmentation models download on first run (some at container startup, the rest on first trace); needs outbound internet then. They live in the container (`/app/.u2net`), **not** in `data/` — a `docker compose down` drops them and they re-fetch (~4 MB); a plain restart keeps them |
 | phone can't reach `http://<host>:3000` | same network? `TRACEFINITY_BIND` not `127.0.0.1`? macOS firewall allowing Docker? |
 | `command not found: docker` / `uv` | add `~/.docker/bin` / `~/.local/bin` to `PATH` |
 | `verify.py` can't connect | container not up, or wrong `TRACEFINITY_BASE_URL` |
